@@ -18,9 +18,16 @@ public class Runner {
         //run dijkstra's algorithm on every city and calculate min distance from all cities to each other
         runDijkstras(cityArray);
         //print distance from chicago (city 58) to all other cities
-        System.out.println("Distance from Chicago (City 58) to: ");
-        for(int i = 0; i < cityArray[57].allDistances.length; i++) {
-            System.out.println(i + 1 + ": " + cityArray[57].allDistances[i]);
+        System.out.println("Distance from Chicago, IL (City 58) to: ");
+        City [] sortAlphabetically= cityArray.clone();
+        Arrays.sort(sortAlphabetically, new Comparator<City>() {
+            @Override
+            public int compare(City o1, City o2) {
+                return((o1.cityName + ", " + o1.state).compareTo(o2.cityName + ", " + o2.state));
+            }
+        });
+        for(int i = 0; i < sortAlphabetically[57].allDistances.length-1; i++) {
+            System.out.println(sortAlphabetically[i + 1].cityName + ", " +sortAlphabetically[i + 1].state + ": " + sortAlphabetically[57].allDistances[i]);
         }
         double [] arr = findTotalAvgDistances(participants, cityArray);
         int minDistanceIndex = findSmallestAvgDistance(arr);
@@ -60,19 +67,18 @@ public class Runner {
 
     public static void runDijkstras(City cityArray []) {
         for(int i = 0; i < cityArray.length; i++){
-            boolean [] visited = new boolean[cityArray.length];
             PriorityQueue<DistanceTo> pq = new PriorityQueue<>(new Comparator<DistanceTo>() {
                 @Override
                 public int compare(DistanceTo o1, DistanceTo o2) {
-                    return (int) (o1.distance - o2.distance);
+                    return Double.compare(o1.distance, o2.distance);
                 }
             });
             cityArray[i].allDistances[i] = 0; //set distance to self as 0
             pq.add(new DistanceTo(cityArray[i].cityNumber, 0)); //push first node into PQ
             while(!pq.isEmpty()) {
                 DistanceTo dt = pq.remove(); //remove from queue
-                for(DistanceTo neighbor: cityArray[dt.cityNumber - 1].connections){
-                    if(cityArray[i].allDistances[neighbor.cityNumber - 1]>neighbor.distance+dt.distance) { //if value currently in index > pred + value found, swap vals
+                for(DistanceTo neighbor : cityArray[dt.cityNumber - 1].connections){
+                    if(cityArray[i].allDistances[neighbor.cityNumber - 1] > neighbor.distance + dt.distance) { //if value currently in index > pred + value found, swap vals
                         pq.add(new DistanceTo(neighbor.cityNumber, neighbor.distance + dt.distance)); //distance= self + neighbor's distance
                         cityArray[i].allDistances[neighbor.cityNumber - 1] = neighbor.distance + dt.distance;
                     }
