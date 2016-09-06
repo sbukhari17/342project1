@@ -26,8 +26,14 @@ public class Runner {
                 return((o1.cityName + ", " + o1.state).compareTo(o2.cityName + ", " + o2.state));
             }
         });
-        for(int i = 0; i < sortAlphabetically[57].allDistances.length-1; i++) {
-            System.out.println(sortAlphabetically[i + 1].cityName + ", " +sortAlphabetically[i + 1].state + ": " + sortAlphabetically[57].allDistances[i]);
+        Map<Integer, Integer> arrayIndexMap= new HashMap<>();
+        for(int i=0; i < sortAlphabetically.length; i++){
+            arrayIndexMap.put(i,sortAlphabetically[i].cityNumber);
+        }
+        //now that our city array is sorted, we need to find the index of chicago
+        int newIndex= Arrays.asList(sortAlphabetically).indexOf(cityArray[57]);
+        for(int i = 0; i < sortAlphabetically[newIndex].allDistances.length-1; i++) {
+            System.out.println(sortAlphabetically[i].cityName + ", " +sortAlphabetically[i].state + ": " + sortAlphabetically[newIndex].allDistances[arrayIndexMap.get(i)-1]);
         }
         double [] arr = findTotalAvgDistances(participants, cityArray);
         int minDistanceIndex = findSmallestAvgDistance(arr);
