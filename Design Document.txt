@@ -1,0 +1,40 @@
+Syed Bukhari
+CS342 Fall 2016
+HW # 1 Design Document
+Classes:
+* City – Holds the city data
+o Variables:
+* String cityName – city’s name
+* String state – state that the city belongs to
+* int cityNumber – city’s ID number
+* List<DistanceTo> connections – city’s adjacency list
+* Double [] allDistances – distances from this city to all other cities
+o Functions:
+* Constructor
+* DistanceTo – Holds information about city distances
+o Variables:
+* int cityNumber – this (destination) city’s ID number
+* double distance – distance from host city to this city
+o Functions:
+* Constructor
+* Participant – holds data about participants
+o Variables:
+* String name – participant name
+* int cityNumber – participant’s home city ID number
+o Functions:
+* Constructor
+* Runner – Driver class for my program
+o Variables:
+* n/a
+o Functions:
+* Main – calls printAuthorInfo &  runner function
+* printAuthorInfo – prints information about the author
+* runProgram – calls file parsing functions, Dijkstra function, adjacency list print function, distances from Chicago function, prints out ideal destination\
+* parseParticipants – parses participants file
+* parseCities – parses cityNames file
+* parseDistances – parses cityDistances file
+* displayAdjacencyList – displays adjacency list of cities
+* runDijkstras – runs Dijkstras and finds smallest distance from one city to all other cities
+* printDistancesFromChicago – prints distances from Chicago to all other cities
+* findTotalAvgDistances – calculates a list of average distances with respect to participants
+* findSmallestAvgDistance – finds smallest average distance in an array of distances
