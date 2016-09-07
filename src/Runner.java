@@ -13,11 +13,16 @@ import java.util.*;
  * Syed Bukhari
  */
 public class Runner {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         printAuthorInfo();
-        runProgram(Runner.class.getResource("FilesToParse/CityNames.txt").getPath(),
-                Runner.class.getResource("FilesToParse/CityDistances.txt").getPath(),
-                Runner.class.getResource("FilesToParse/Participants.txt").getPath());
+
+        try {
+            runProgram(Runner.class.getResource("FilesToParse/CityNames.txt").getPath(),
+                    Runner.class.getResource("FilesToParse/CityDistances.txt").getPath(),
+                    Runner.class.getResource("FilesToParse/Participants.txt").getPath());
+        } catch (IOException e) {
+            System.out.println("Unable to locate a resource file, program will exit.");
+        }
 
     }
 
