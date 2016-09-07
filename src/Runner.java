@@ -17,9 +17,9 @@ public class Runner {
         printAuthorInfo();
 
         try {
-            runProgram(Runner.class.getResource("FilesToParse/CityNames.txt").getPath(),
-                    Runner.class.getResource("FilesToParse/CityDistances.txt").getPath(),
-                    Runner.class.getResource("FilesToParse/Participants.txt").getPath());
+            runProgram("FilesToParse/CityNames.txt",
+                    "FilesToParse/CityDistances.txt",
+                    "FilesToParse/Participants.txt");
         } catch (IOException e) {
             System.out.println("Unable to locate a resource file, program will exit.");
         }
