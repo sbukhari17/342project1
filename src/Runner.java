@@ -40,17 +40,11 @@ public class Runner {
      * @throws IOException
      */
     public static void runProgram(String cityNamesFile, String cityDistancesFile, String participantsFile) throws IOException {
-        //read in cities into city array
         City [] cityArray = parseCities(cityNamesFile);
-        //read in distances between cities and populate DistanceTo arrays within cities array
-        populateDistances(cityArray, cityDistancesFile);
-        //read in participants and their locations
+        parseDistances(cityArray, cityDistancesFile);
         Participant [] participants = populateParticipants(participantsFile);
-        //display adjacency list
         displayAdjacencyList(cityArray);
-        //run dijkstra's algorithm on every city and calculate min distance from all cities to each other
         runDijkstras(cityArray);
-        //print distance from chicago (city 58) to all other cities
         printDistancesFromChicago(cityArray);
         double [] arr = findTotalAvgDistances(participants, cityArray);
         int minDistanceIndex = findSmallestAvgDistance(arr);
@@ -231,7 +225,7 @@ public class Runner {
      * @param filePath
      * @throws IOException
      */
-    public static void populateDistances(City cities[], String filePath) throws IOException {
+    public static void parseDistances(City cities[], String filePath) throws IOException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
