@@ -31,6 +31,14 @@ public class Runner {
         System.out.println("Class: CS342, Fall 2016");
         System.out.println("Program: #1, Optimal meeting point calculator");
     }
+
+    /**
+     * Runs the program, calls all functions
+     * @param cityNamesFile
+     * @param cityDistancesFile
+     * @param participantsFile
+     * @throws IOException
+     */
     public static void runProgram(String cityNamesFile, String cityDistancesFile, String participantsFile) throws IOException {
         //read in cities into city array
         City [] cityArray = parseCities(cityNamesFile);
@@ -43,6 +51,20 @@ public class Runner {
         //run dijkstra's algorithm on every city and calculate min distance from all cities to each other
         runDijkstras(cityArray);
         //print distance from chicago (city 58) to all other cities
+        printDistancesFromChicago(cityArray);
+        double [] arr = findTotalAvgDistances(participants, cityArray);
+        int minDistanceIndex = findSmallestAvgDistance(arr);
+        DecimalFormat df = new DecimalFormat("##.##");
+        System.out.println("The city with the smallest average travel distance is " + cityArray[minDistanceIndex].cityName + ", " +
+                cityArray[minDistanceIndex].state + " with an average distance of " + new DecimalFormat("##.##").format(arr[minDistanceIndex]).toString() +" miles.");
+    }
+
+    /**
+     *
+     * Prints out the distance of every city from Chicago
+     * @param cityArray
+     */
+    public static void printDistancesFromChicago(City [] cityArray){
         System.out.println("Distance from Chicago, IL (City 58) to: ");
         City [] sortAlphabetically= cityArray.clone();
         Arrays.sort(sortAlphabetically, new Comparator<City>() {
@@ -60,13 +82,14 @@ public class Runner {
         for(int i = 0; i < sortAlphabetically[newIndex].allDistances.length-1; i++) {
             System.out.println(sortAlphabetically[i].cityName + ", " +sortAlphabetically[i].state + ": " + sortAlphabetically[newIndex].allDistances[arrayIndexMap.get(i)-1]);
         }
-        double [] arr = findTotalAvgDistances(participants, cityArray);
-        int minDistanceIndex = findSmallestAvgDistance(arr);
-        DecimalFormat df = new DecimalFormat("##.##");
-        System.out.println("The city with the smallest average travel distance is " + cityArray[minDistanceIndex].cityName + ", " +
-                cityArray[minDistanceIndex].state + " with an average distance of " + new DecimalFormat("##.##").format(arr[minDistanceIndex]).toString() +" miles.");
     }
-    public static int findSmallestAvgDistance(double avgDistances[]) { //finds smallest average distance in an array of average distances
+
+    /**
+     * Finds smallest average distance
+     * @param avgDistances
+     * @return
+     */
+    public static int findSmallestAvgDistance(double avgDistances[]) {
         double min = avgDistances[0];
         int index = 0;
         for(int i = 0; i < avgDistances.length; i++) {
@@ -78,7 +101,13 @@ public class Runner {
         return index;
     }
 
-    public static double [] findTotalAvgDistances(Participant participants[], City cities[]) { // finds the average distance to all cities with regards to the participants' locations
+    /**
+     * Creates an array of average distances with respect to the participants
+     * @param participants
+     * @param cities
+     * @return
+     */
+    public static double [] findTotalAvgDistances(Participant participants[], City cities[]) {
         ArrayList<double[]> distancesToCheckFor = new ArrayList<>();
         double [] results = new double[cities.length];
         for(Participant participant : participants){
@@ -95,7 +124,11 @@ public class Runner {
         return results;
     }
 
-    public static void runDijkstras(City cityArray []) { //runs dijkstra's algorithm on every city to find the smallest distance to every other city
+    /**
+     * runs Dijkstra's algorithm to find the shortest distance from every city to every other city
+     * @param cityArray
+     */
+    public static void runDijkstras(City cityArray []) {
         for(int i = 0; i < cityArray.length; i++){
             PriorityQueue<DistanceTo> pq = new PriorityQueue<>(new Comparator<DistanceTo>() {
                 @Override
@@ -103,22 +136,25 @@ public class Runner {
                     return Double.compare(o1.distance, o2.distance);
                 }
             });
-            cityArray[i].allDistances[i] = 0; //set distance to self as 0
-            pq.add(new DistanceTo(cityArray[i].cityNumber, 0)); //push first node into PQ
+            cityArray[i].allDistances[i] = 0;
+            pq.add(new DistanceTo(cityArray[i].cityNumber, 0));
             while(!pq.isEmpty()) {
-                DistanceTo dt = pq.remove(); //remove from queue
+                DistanceTo dt = pq.remove();
                 for(DistanceTo neighbor : cityArray[dt.cityNumber - 1].connections){
-                    if(cityArray[i].allDistances[neighbor.cityNumber - 1] > neighbor.distance + dt.distance) { //if value currently in index > pred + value found, swap vals
-                        pq.add(new DistanceTo(neighbor.cityNumber, neighbor.distance + dt.distance)); //distance= self + neighbor's distance
+                    if(cityArray[i].allDistances[neighbor.cityNumber - 1] > neighbor.distance + dt.distance) {
+                        pq.add(new DistanceTo(neighbor.cityNumber, neighbor.distance + dt.distance));
                         cityArray[i].allDistances[neighbor.cityNumber - 1] = neighbor.distance + dt.distance;
                     }
                 }
             }
         }
-
     }
 
-    public static void displayAdjacencyList(City cityArray[]) { //displays the adjacency lists of cities
+    /**
+     * Displays the adjacency list of cities
+     * @param cityArray
+     */
+    public static void displayAdjacencyList(City cityArray[]) {
         for(City city : cityArray) {
             System.out.print(city.cityNumber + " ");
             for(DistanceTo connection : city.connections){
@@ -129,7 +165,13 @@ public class Runner {
         }
     }
 
-    public static Participant [] populateParticipants(String filePath) throws IOException { //parses the participants file
+    /**
+     * parses the participants file
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
+    public static Participant [] populateParticipants(String filePath) throws IOException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
@@ -151,7 +193,13 @@ public class Runner {
         }
     }
 
-    public static City [] parseCities(String filePath) throws IOException { //parses the cityNames file and initializes distances for later use by dijkstra's algorithm function
+    /**
+     * parses the cityNames file and initializes distances to infinity for use by Dijkstra's
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
+    public static City [] parseCities(String filePath) throws IOException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
@@ -177,7 +225,13 @@ public class Runner {
         }
     }
 
-    public static void populateDistances(City cities[], String filePath) throws IOException { //parses the cityDistances file and populates cities' adjacency lists
+    /**
+     * parses the cityDistances file
+     * @param cities
+     * @param filePath
+     * @throws IOException
+     */
+    public static void populateDistances(City cities[], String filePath) throws IOException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
@@ -188,13 +242,10 @@ public class Runner {
                 int city1 = Integer.parseInt(parseLine.nextToken());
                 int city2 = Integer.parseInt(parseLine.nextToken());
                 double distance = Double.parseDouble(parseLine.nextToken());
-                //go to city1's index in cities (city1-1 b/c arrays start @ 0)
-                //create new ArrayList if null
-                //add a connection with city2 w/ distance
-                if(cities[city1 - 1].connections == null) //distance from city 1 to city 2
+                if(cities[city1 - 1].connections == null)
                     cities[city1 - 1].connections = new ArrayList<>();
                 cities[city1 - 1].connections.add(new DistanceTo(city2, distance));
-                if(cities[city2 - 1].connections == null) //distance from city 2 to city 1
+                if(cities[city2 - 1].connections == null)
                     cities[city2 - 1].connections = new ArrayList<>();
                 cities[city2 - 1].connections.add(new DistanceTo(city1, distance));
             }
