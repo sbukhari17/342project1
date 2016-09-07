@@ -3,16 +3,36 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 /**
- * Created by Syed on 8/30/2016.
+ * Optimal meeting point calculator
+ *
+ * Class: CS342, Fall 2016
+ * System: Windows 10, IntelliJ IDE
+ * Author Code Number: 1530
+ *
+ *
+ * Syed Bukhari
  */
 public class Runner {
     public static void main(String[] args) throws IOException {
+        printAuthorInfo();
+        runProgram(Runner.class.getResource("FilesToParse/CityNames.txt").getPath(),
+                Runner.class.getResource("FilesToParse/CityDistances.txt").getPath(),
+                Runner.class.getResource("FilesToParse/Participants.txt").getPath());
+
+    }
+
+    public static void printAuthorInfo() { //prints author info as mandated by syllabus
+        System.out.println("Author Code Number: 1530");
+        System.out.println("Class: CS342, Fall 2016");
+        System.out.println("Program: #1, Optimal meeting point calculator");
+    }
+    public static void runProgram(String cityNamesFile, String cityDistancesFile, String participantsFile) throws IOException {
         //read in cities into city array
-        City [] cityArray = parseCities(Runner.class.getResource("FilesToParse/CityNames.txt").getPath());
+        City [] cityArray = parseCities(cityNamesFile);
         //read in distances between cities and populate DistanceTo arrays within cities array
-        populateDistances(cityArray, Runner.class.getResource("FilesToParse/CityDistances.txt").getPath());
+        populateDistances(cityArray, cityDistancesFile);
         //read in participants and their locations
-        Participant [] participants = populateParticipants(Runner.class.getResource("FilesToParse/Participants.txt").getPath());
+        Participant [] participants = populateParticipants(participantsFile);
         //display adjacency list
         displayAdjacencyList(cityArray);
         //run dijkstra's algorithm on every city and calculate min distance from all cities to each other
@@ -41,8 +61,7 @@ public class Runner {
         System.out.println("The city with the smallest average travel distance is " + cityArray[minDistanceIndex].cityName + ", " +
                 cityArray[minDistanceIndex].state + " with an average distance of " + new DecimalFormat("##.##").format(arr[minDistanceIndex]).toString() +" miles.");
     }
-
-    public static int findSmallestAvgDistance(double avgDistances[]) {
+    public static int findSmallestAvgDistance(double avgDistances[]) { //finds smallest average distance in an array of average distances
         double min = avgDistances[0];
         int index = 0;
         for(int i = 0; i < avgDistances.length; i++) {
@@ -54,7 +73,7 @@ public class Runner {
         return index;
     }
 
-    public static double [] findTotalAvgDistances(Participant participants[], City cities[]) {
+    public static double [] findTotalAvgDistances(Participant participants[], City cities[]) { // finds the average distance to all cities with regards to the participants' locations
         ArrayList<double[]> distancesToCheckFor = new ArrayList<>();
         double [] results = new double[cities.length];
         for(Participant participant : participants){
@@ -71,7 +90,7 @@ public class Runner {
         return results;
     }
 
-    public static void runDijkstras(City cityArray []) {
+    public static void runDijkstras(City cityArray []) { //runs dijkstra's algorithm on every city to find the smallest distance to every other city
         for(int i = 0; i < cityArray.length; i++){
             PriorityQueue<DistanceTo> pq = new PriorityQueue<>(new Comparator<DistanceTo>() {
                 @Override
@@ -94,7 +113,7 @@ public class Runner {
 
     }
 
-    public static void displayAdjacencyList(City cityArray[]) {
+    public static void displayAdjacencyList(City cityArray[]) { //displays the adjacency lists of cities
         for(City city : cityArray) {
             System.out.print(city.cityNumber + " ");
             for(DistanceTo connection : city.connections){
@@ -105,7 +124,7 @@ public class Runner {
         }
     }
 
-    public static Participant [] populateParticipants(String filePath) throws IOException {
+    public static Participant [] populateParticipants(String filePath) throws IOException { //parses the participants file
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
@@ -127,7 +146,7 @@ public class Runner {
         }
     }
 
-    public static City [] parseCities(String filePath) throws IOException {
+    public static City [] parseCities(String filePath) throws IOException { //parses the cityNames file and initializes distances for later use by dijkstra's algorithm function
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
@@ -153,7 +172,7 @@ public class Runner {
         }
     }
 
-    public static void populateDistances(City cities[], String filePath) throws IOException {
+    public static void populateDistances(City cities[], String filePath) throws IOException { //parses the cityDistances file and populates cities' adjacency lists
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
