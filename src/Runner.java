@@ -1,5 +1,6 @@
 import java.io.*;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -15,13 +16,20 @@ import java.util.*;
 public class Runner {
     public static void main(String[] args) {
         printAuthorInfo();
-
         try {
-            runProgram("FilesToParse/CityNames.txt",
-                    "FilesToParse/CityDistances.txt",
-                    "FilesToParse/Participants.txt");
+            runProgram("CityNames.txt",
+                    "CityDistances.txt",
+                    "Participants.txt");
         } catch (IOException e) {
-            System.out.println("Unable to locate a resource file, program will exit.");
+            System.out.println(e.getMessage());
+        } catch (FileFormatException e) {
+            System.out.println(e.getMessage());
+        } catch(NumberFormatException e) {
+            System.out.println("Invalid File Format detected: the first line of input should be an integer.");
+        } catch(NoSuchElementException e) {
+            System.out.println("Invalid File Format detected: Please make sure you adhere to the CSV format.");
+        } catch(ArrayIndexOutOfBoundsException e){
+            System.out.println("Invalid File Format detected: Please make sure your distances are mapped to valid cities.");
         }
 
     }
@@ -39,10 +47,10 @@ public class Runner {
      * @param participantsFile
      * @throws IOException
      */
-    public static void runProgram(String cityNamesFile, String cityDistancesFile, String participantsFile) throws IOException {
+    public static void runProgram(String cityNamesFile, String cityDistancesFile, String participantsFile) throws IOException, FileFormatException {
         City [] cityArray = parseCities(cityNamesFile);
         parseDistances(cityArray, cityDistancesFile);
-        Participant [] participants = populateParticipants(participantsFile);
+        Participant [] participants = parseParticipants(participantsFile);
         displayAdjacencyList(cityArray);
         runDijkstras(cityArray);
         printDistancesFromChicago(cityArray);
@@ -67,7 +75,7 @@ public class Runner {
                 return((o1.cityName + ", " + o1.state).compareTo(o2.cityName + ", " + o2.state));
             }
         });
-        Map<Integer, Integer> arrayIndexMap= new HashMap<>();
+        Map<Integer, Integer> arrayIndexMap= new HashMap<>();   //map city index ordered array to alphabetically odered array indexes
         for(int i=0; i < sortAlphabetically.length; i++){
             arrayIndexMap.put(i,sortAlphabetically[i].cityNumber);
         }
@@ -165,10 +173,12 @@ public class Runner {
      * @return
      * @throws IOException
      */
-    public static Participant [] populateParticipants(String filePath) throws IOException {
+    public static Participant [] parseParticipants(String filePath) throws IOException, FileFormatException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
+            if(input==null)
+                throw new FileFormatException("Empty file detected. Program will exit.");
             int numberOfParticipants = Integer.parseInt(input);
             Participant [] participantList = new Participant[numberOfParticipants];
             System.out.println("Adjacency list using ids:");
@@ -184,6 +194,8 @@ public class Runner {
             throw new FileNotFoundException("Could not open " + filePath);
         } catch (IOException e) {
             throw e;
+        } catch (NullPointerException e) {
+            throw new FileFormatException("Null value detected, please check your input file format. Program will exit.");
         }
     }
 
@@ -193,10 +205,13 @@ public class Runner {
      * @return
      * @throws IOException
      */
-    public static City [] parseCities(String filePath) throws IOException {
+    public static City [] parseCities(String filePath) throws IOException, FileFormatException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
+            if(input==null)
+                throw new FileFormatException("Empty File detected. Program will exit.");
+
             int numberOfCities = Integer.parseInt(input);
             City [] cityList = new City[numberOfCities];
             for(int i = 0; i < numberOfCities; i++){
@@ -216,6 +231,8 @@ public class Runner {
             throw new FileNotFoundException("Unable to open " + filePath);
         } catch (IOException e) {
             throw e;
+        } catch (NullPointerException e) {
+            throw new FileFormatException("Null value detected, please check your input file format. Program will exit.");
         }
     }
 
@@ -225,11 +242,13 @@ public class Runner {
      * @param filePath
      * @throws IOException
      */
-    public static void parseDistances(City cities[], String filePath) throws IOException {
+    public static void parseDistances(City cities[], String filePath) throws IOException, FileFormatException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             String input = br.readLine();
+            if(input==null)
+                throw new FileFormatException("Empty File detected. Program will exit");
             int numberOfDistances = Integer.parseInt(input);
             while((input = br.readLine()) != null){
                 StringTokenizer parseLine = new StringTokenizer(input, " ");
@@ -247,6 +266,8 @@ public class Runner {
             throw new FileNotFoundException("Unable to open " + filePath);
         } catch (IOException e) {
             throw e;
+        }  catch (NullPointerException e) {
+            throw new FileFormatException("Null value detected, please check your input file format. Program will exit.");
         }
 
     }
